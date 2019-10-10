@@ -3,6 +3,7 @@ import random
 import numpy as np
 from deap import tools
 import fitness_function as ff
+import numpy as np
 
 
 class FeatureSelectionGA:
@@ -43,7 +44,7 @@ class FeatureSelectionGA:
             print("Shape od train_x: {} and target: {}".format(x.shape,y.shape))
         self.final_fitness = []
         self.fitness_in_generation = {}
-    	self.best_ind = None
+        self.best_ind = None
     
     def evaluate(self,individual):
         fit_obj = ff.FitenessFunction(self.cv_split)
