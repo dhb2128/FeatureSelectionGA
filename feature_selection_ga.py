@@ -4,6 +4,7 @@ import numpy as np
 from deap import tools
 import fitness_function as ff
 import numpy as np
+from parallel_util import multiprocess_func
 
 
 class FeatureSelectionGA:
@@ -15,7 +16,7 @@ class FeatureSelectionGA:
 
     
     """
-    def __init__(self,model,x,y,cv_split=5,verbose=0):
+    def __init__(self,model,x,y,cv_split=5,verbose=0, do_parallel=False):
         """
             Parameters
             -----------
@@ -41,19 +42,19 @@ class FeatureSelectionGA:
         self.verbose = verbose
         if self.verbose==1:
             print("Model {} will select best features among {} features using cv_split :{}.".format(model,x.shape[1],cv_split))
-            print("Shape od train_x: {} and target: {}".format(x.shape,y.shape))
+            print("Shape of train_x: {} and target: {}".format(x.shape,y.shape))
+        self.do_parallel = do_parallel
         self.final_fitness = []
         self.fitness_in_generation = {}
         self.best_ind = None
+        self.fit_obj = ff.FitenessFunction(self.cv_split)
     
     def evaluate(self,individual):
-        fit_obj = ff.FitenessFunction(self.cv_split)
         np_ind = np.asarray(individual)
         if np.sum(np_ind) == 0:
             fitness = 0.0
         else:
-            feature_idx = np.where(np_ind==1)[0]
-            fitness = fit_obj.calculate_fitness(self.model,self.x[:,feature_idx],self.y)
+            fitness = self.fit_obj.calculate_fitness(self.model,self.x[:, np_ind == 1],self.y)
         
         if self.verbose == 1:
             print("Individual: {}  Fitness_score: {} ".format(individual,fitness))
